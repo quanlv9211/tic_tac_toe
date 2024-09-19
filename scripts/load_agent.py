@@ -24,6 +24,6 @@ def load_opponent_model(args):
         model = MiniMaxPlayer(args, args.opponent_symbol)
     else:
         raise Exception('Please define the model')
-    logger.info('The opponent's model is {} '.format(args.opponent_model))
+    logger.info('The opponent model is {} '.format(args.opponent_model))
     return model
 
