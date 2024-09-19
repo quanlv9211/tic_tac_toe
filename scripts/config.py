@@ -5,6 +5,7 @@ import os
 parser = argparse.ArgumentParser(description='Tic Tac Toe Config')
 
 # init
+parser.add_argument('--seed', type=int, default=1, help='seed')
 parser.add_argument('--width', type=int, default=3, help='chieu rong cua bang')
 parser.add_argument('--height', type=int, default=3, help='chieu dai cua bang')
 parser.add_argument('--winstreak', type=int, default=3, help='so o lien tiep de thang')

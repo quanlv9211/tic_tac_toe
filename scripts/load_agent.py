@@ -10,8 +10,8 @@ def load_model(args):
     elif args.your_model == 'minimax':
         model = MiniMaxPlayer(args, args.your_symbol)
     else:
-        raise Exception('chua co mo hinh nay')
-    logger.info('Ban su dung mo hinh {} '.format(args.your_model))
+        raise Exception('Please define the model')
+    logger.info('Your model is {} '.format(args.your_model))
     return model
 
 
@@ -23,7 +23,7 @@ def load_opponent_model(args):
     elif args.opponent_model == 'minimax':
         model = MiniMaxPlayer(args, args.opponent_symbol)
     else:
-        raise Exception('chua co mo hinh nay')
-    logger.info('Doi thu su dung mo hinh {} '.format(args.opponent_model))
+        raise Exception('Please define the model')
+    logger.info('The opponent's model is {} '.format(args.opponent_model))
     return model
 

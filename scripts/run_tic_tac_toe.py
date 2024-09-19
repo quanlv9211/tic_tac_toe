@@ -12,8 +12,10 @@ sys.path.append(BASE_DIR)
 class Runner(object):
     def __init__(self, args):
         self.args = args
-        self.player1 = load_model(self.args).to(self.args.device)
-        self.player2 = load_opponent_model(self.args).to(self.args.device)
+        # self.player1 = load_model(self.args).to(self.args.device)
+        # self.player2 = load_opponent_model(self.args).to(self.args.device)
+        self.player1 = load_model(self.args)
+        self.player2 = load_opponent_model(self.args)
         self.simulator = Simulator(self.args, self.player1, self.player2)
 
     def run(self):
@@ -31,13 +33,13 @@ class Runner(object):
                 player1_win += 1
             if winner == -1:
                 player2_win += 1
-        if i % print_every_n == 0:
-            logger.info('Epoch %d, player 1 winrate: %.02f, player 2 winrate: %.02f' % (i, player1_win / i, player2_win / i))
-        #self.player1.backup()
-        #self.player2.backup()
-        self.simulator.reset()
-    #self.player1.save_policy()
-    #self.player2.save_policy()
+            if i % print_every_n == 0:
+                logger.info('Epoch %d, player 1 winrate: %.02f, player 2 winrate: %.02f' % (i, player1_win / i, player2_win / i))
+            #self.player1.backup()
+            #self.player2.backup()
+            self.simulator.reset()
+        #self.player1.save_policy()
+        #self.player2.save_policy()
         logger.info('-------------------------------------------------------')
 
     def test(self):

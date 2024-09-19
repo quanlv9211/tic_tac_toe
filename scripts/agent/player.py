@@ -5,11 +5,8 @@ import math
 alphabet = list(string.ascii_uppercase)
 
 
-class HumanPlayer(BasicPlayer):
-
-    def __init__(self):
-
-    @staticmethod
+class HumanPlayer():
+  
     def parse_cords(raw):
         try:
             if raw[0].isalpha():

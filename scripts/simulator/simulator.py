@@ -2,6 +2,7 @@ from ..board.board import Board
 
 class Simulator():
     def __init__(self, args, player1, player2):
+        self.args = args
         self.p1 = player1
         self.p2 = player2
         self.current_player = None
@@ -9,13 +10,13 @@ class Simulator():
         self.p2_symbol = 'O'
 
         # the state is the board
-        self.current_board = Board(args.width, args.height, args.winstreak)
+        self.current_board = Board(self.args.width, self.args.height, self.args.winstreak)
 
     def reset(self):
-        self.current_board = Board(args.width, args.height, args.winstreak)
+        self.current_board = Board(self.args.width, self.args.height, self.args.winstreak)
 
 
-    def play(render=False):
+    def play(self, render=False):
         while not self.current_board.gameover():
             if render:
                 self.current_board.render()
