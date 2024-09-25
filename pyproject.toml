@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "tic_tac_toe"
+version = "0.1.0"
+description = "Tic Tac Toe environment with Python API"
+readme = "README.md"
+authors = []
+license = { file = "LICENSE" }
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["Tic Tac Toe"]
+dependencies = [
+
+]
+requires-python = ">=3.0"
+
+[tool.setuptools]
+packages = ["tic_tac_toe"]
+
+[project.urls]
+Homepage = "https://github.com/quanlv9211/tic_tac_toe"
+
