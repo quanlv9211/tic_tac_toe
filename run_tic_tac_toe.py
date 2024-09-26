@@ -18,10 +18,6 @@ class Runner(object):
         self.player2 = load_opponent_model(self.args)
         self.simulator = Simulator(self.args, self.player1, self.player2)
 
-    def run(self):
-        self.train()
-        self.test()
-
     def train(self):
         logger.info("Start training")
         player1_win = 0.0
@@ -76,4 +72,9 @@ if __name__ == "__main__":
     set_random(args.seed)
     init_logger(prepare_dir(args.output_folder) + "result.txt")
     runner = Runner(args)
-    runner.run()
+    if args.function == 'train':
+        runner.train()
+    elif args.function == 'test':
+        runner.test()
+    else:
+        print('Invalid function')

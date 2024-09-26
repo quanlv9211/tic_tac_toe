@@ -1,4 +1,5 @@
 import argparse
+from email.policy import default
 import torch
 import os
 
@@ -22,6 +23,7 @@ parser.add_argument('--lr', type=float, default=0.01, help='so o lien tiep de th
 parser.add_argument('--log_interval', type=int, default=500, help='in ra thong bao sau bao nhieu epoch')
 parser.add_argument('--test_games', type=int, default=100, help='so game kiem tra')
 parser.add_argument('--render', type=bool, default=False, help='in ra ban co trong qua trinh choi khong')
+parser.add_argument('--function', type=str, default='', help='train/test')
 
 # specific argument
 parser.add_argument('--minimax_depth', type=int, default=2, help='chieu sau cua thuat toan minimax_depth')
