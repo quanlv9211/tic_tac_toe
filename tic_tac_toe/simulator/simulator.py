@@ -1,3 +1,4 @@
+from functools import partial
 from ..board.board import Board
 import threading
 
@@ -31,7 +32,8 @@ class Simulator:
             player,
             symbol,
         )  # use this to determine the winner if timeout happen by handling exception
-        mv_thread = threading.Thread(self.move_fn, args=(player, board, symbol))
+        mv_fn = partial(self.move_fn, player, board, symbol)
+        mv_thread = threading.Thread(mv_fn)
         mv_thread.start()
         mv_thread.join(self.time_limit)
 
