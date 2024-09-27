@@ -31,11 +31,15 @@ class Simulator:
         self.current_player = (
             player,
             symbol,
-        )  # use this to determine the winner if timeout happen by handling exception
+        )  # use this to determine the winner if timeout happen
         mv_fn = partial(self.move_fn, player, board, symbol)
-        mv_thread = threading.Thread(mv_fn)
+        mv_thread = threading.Thread(target=mv_fn)
         mv_thread.start()
         mv_thread.join(self.time_limit)
+
+        if mv_thread.is_alive():
+            print("time limit reached")
+            raise Exception("Time limit result not implemented")
 
     def play(self, render=False):
         while not self.current_board.gameover():
