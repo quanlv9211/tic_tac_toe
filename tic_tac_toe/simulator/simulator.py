@@ -1,4 +1,6 @@
+from functools import partial
 from ..board.board import Board
+import threading
 
 
 class Simulator:
@@ -9,6 +11,7 @@ class Simulator:
         self.current_player = None
         self.p1_symbol = "X"  # X di truoc
         self.p2_symbol = "O"
+        self.time_limit = None
 
         # the state is the board
         self.current_board = Board(
@@ -20,20 +23,44 @@ class Simulator:
             self.args.width, self.args.height, self.args.winstreak
         )
 
+    def move_fn(self, player, board, symbol):
+        move = player.get_move(board)
+        self.current_board.set_move(move, symbol)
+
+    def time_contrl_move(self, player, board, symbol):
+        self.current_player = (
+            player,
+            symbol,
+        )  # use this to determine the winner if timeout happen
+        mv_fn = partial(self.move_fn, player, board, symbol)
+        mv_thread = threading.Thread(target=mv_fn)
+        mv_thread.start()
+        mv_thread.join(self.time_limit)
+
+        if mv_thread.is_alive():
+            print("time limit reached")
+            raise Exception("Time limit result not implemented")
+
     def play(self, render=False):
         while not self.current_board.gameover():
             if render:
                 self.current_board.render()
-            moveX = self.p1.get_move(self.current_board)
-            self.current_board.set_move(moveX, "X")
+
+            if self.time_limit is not None:
+                self.time_contrl_move(self.p1, self.current_board, "X")
+            else:
+                self.move_fn(self.p1, self.current_board, "X")
 
             if self.current_board.gameover():
                 break
 
             if render:
                 self.current_board.render()
-            moveO = self.p2.get_move(self.current_board)
-            self.current_board.set_move(moveO, "O")
+
+            if self.time_limit is not None:
+                self.time_contrl_move(self.p2, self.current_board, "O")
+            else:
+                self.move_fn(self.p2, self.current_board, "O")
 
         if render:
             self.current_board.render()
