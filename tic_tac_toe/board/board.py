@@ -19,6 +19,14 @@ class Board:
     def set_move(self, pos, player):  # sets a move onto the board
         self.board[pos[1]][pos[0]] = player
 
+    def move2id(self, move: tuple):
+        id = move[0] * len(self.board[0]) + move[1]
+        return id
+
+    def id2move(self, id):
+        x, y = id // len(self.board[0]), id % len(self.board[0])
+        return x, y
+
     def possible_moves(self):  # returns list of all empty cells' (x, y)
         moves = []
 
@@ -76,3 +84,15 @@ class Board:
             print(f"{alphabet[index]} {' | '.join(row)}")
             if index + 1 < self.height:
                 print("  " + "-" * (self.width * 4 - 3))
+
+    def to_string(self):
+        row2str = ["".join(row) for row in self.board]
+        return "".join(row2str)
+
+    def available_actions(self):
+        """
+        similar to `possible_moves`, but return action id instead
+        """
+        all_moves = self.possible_moves()
+        all_ids = [self.move2id(mv) for mv in all_moves]
+        return all_ids
