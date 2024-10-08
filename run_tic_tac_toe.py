@@ -16,7 +16,8 @@ class Runner(object):
         # self.player2 = load_opponent_model(self.args).to(self.args.device)
         self.player1 = load_model(self.args)
         self.player2 = load_opponent_model(self.args)
-        self.simulator = Simulator(self.args, self.player1, self.player2)
+        dict_args = dict(args)
+        self.simulator = Simulator(**dict_args, self.player1, self.player2)
 
     def train(self):
         logger.info("Start training")

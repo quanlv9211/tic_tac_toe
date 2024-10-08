@@ -1,29 +1,34 @@
 from functools import partial
 from ..board.board import Board
 import threading
+from ..agent.player import Player
 
 
 class Simulator:
-    def __init__(self, args, player1, player2):
-        self.args = args
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        winstreak: int,
+        player1: Player,
+        player2: Player,
+    ):
         self.p1 = player1
         self.p2 = player2
         self.current_player = None
         self.p1_symbol = "X"  # X di truoc
         self.p2_symbol = "O"
         self.time_limit = None
+        self.width = width
+        self.height = height
 
         # the state is the board
-        self.current_board = Board(
-            self.args.width, self.args.height, self.args.winstreak
-        )
+        self.current_board = Board(width, height, winstreak)
 
     def reset(self):
-        self.current_board = Board(
-            self.args.width, self.args.height, self.args.winstreak
-        )
+        self.current_board = Board(self.width, self.height, self.winstreak)
 
-    def move_fn(self, player, board, symbol):
+    def move_fn(self, player: Player, board: Board, symbol: str):
         move = player.get_move(board)
         self.current_board.set_move(move, symbol)
 
@@ -76,3 +81,48 @@ class Simulator:
                 return -1
         elif len(self.current_board.possible_moves()) == 0:
             return 0
+
+    def reset(self):
+        """
+        Gym API for interacting with the environment,
+        see https://github.com/Farama-Foundation/Gymnasium
+        return current state of the board
+        """
+        self.current_board.reset()
+        # bot play first
+        self.move_fn(self.p1, self.current_board, "X")
+        return self.get_obs(), self.current_board.available_actions()
+
+    def get_reward(self):
+        if self.current_board.gameover():
+            if self.current_board.iswin("O"):
+                return 1
+            elif self.current_board.iswin("X"):
+                return -1
+        return 0
+
+    def get_obs(self):
+        return self.current_board.to_string()
+
+    def get_done(self):
+        return self.current_board.gameover()
+
+    def step(self, action: int):
+        """
+        Gym API for interacting with the environment,
+        see https://github.com/Farama-Foundation/Gymnasium
+        """
+        move = self.current_board.id2move(action)
+        # agent plays as 'O'
+        self.current_board.set_move(move, "O")
+        if self.current_board.gameover():
+            return self.get_obs(), self.get_reward(), self.get_done()
+
+        # bot move
+        self.move_fn(self.p1, self.current_board, "X")
+        return (
+            self.get_obs(),
+            self.get_reward(),
+            self.get_done(),
+            self.current_board.available_actions(),
+        )

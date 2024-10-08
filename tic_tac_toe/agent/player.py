@@ -1,23 +1,29 @@
 import random
 import string
 import math
+from ..board import Board
 
 alphabet = list(string.ascii_uppercase)
 
 
-class HumanPlayer():
-  
+class Player:
+    def get_move(self, state):
+        raise NotImplementedError("Implement in the subclasses")
+
+
+class HumanPlayer(Player):
+
     def parse_cords(raw):
         try:
             if raw[0].isalpha():
-                return (int(raw[1:])-1, alphabet.index(raw[0]))
+                return (int(raw[1:]) - 1, alphabet.index(raw[0]))
             elif raw[-1].isalpha():
-                return (int(raw[:-1])-1, alphabet.index(raw[-1]))
+                return (int(raw[:-1]) - 1, alphabet.index(raw[-1]))
             else:
                 return None
         except Exception:
             return None
-    
+
     def get_move(self, state):
         cords = self.parse_cords(input("Your turn!\nInput move: ").upper())
         while cords not in state.possible_moves():
@@ -26,24 +32,24 @@ class HumanPlayer():
         return cords
 
 
-class RandomPlayer():
+class RandomPlayer(Player):
 
     def get_move(self, state):
         return random.choice(state.possible_moves())
-        
 
-class MiniMaxPlayer():
-    def __init__(self, args, player='X'):
-        self.player = player # X or O
-        self.other_player = 'O' if player == 'X' else 'X'
+
+class MiniMaxPlayer(Player):
+    def __init__(self, args, player="X"):
+        self.player = player  # X or O
+        self.other_player = "O" if player == "X" else "X"
         self.search_depth = args.minimax_depth
-    
-    def get_move(self, state):
-        return self.minimax(state, 0, -math.inf, math.inf, True)['move']
 
-    def minimax(self, state, depth, alpha, beta, maximizing): # returns optimal move
+    def get_move(self, state):
+        return self.minimax(state, 0, -math.inf, math.inf, True)["move"]
+
+    def minimax(self, state, depth, alpha, beta, maximizing):  # returns optimal move
         if state.gameover() or depth == self.search_depth:
-            return {'move': None, 'score': state.evaluate(self.player)}
+            return {"move": None, "score": state.evaluate(self.player)}
 
         # if depth == 0:
         #     moves = []
@@ -58,44 +64,44 @@ class MiniMaxPlayer():
         #         if check['score'] > best_score:
         #             moves = []
         #             best_score = check['score']
-                
+
         #         moves.append(check)
-                
+
         #         alpha = max(alpha, best_score)
         #         if best_score >= beta:
         #             break
-            
+
         #     return random.choice(moves)
-        
+
         if maximizing:
-            best = {'move': None, 'score': -math.inf}
+            best = {"move": None, "score": -math.inf}
             for move in state.possible_moves():
                 state.set_move(move, self.player)
-                check = self.minimax(state, depth+1, alpha, beta, False)
+                check = self.minimax(state, depth + 1, alpha, beta, False)
 
-                state.set_move(move, ' ') # undo move
-                check['move'] = move # attribute move to its resulting board state
+                state.set_move(move, " ")  # undo move
+                check["move"] = move  # attribute move to its resulting board state
 
-                if check['score'] > best['score']:
+                if check["score"] > best["score"]:
                     best = check
-                
-                alpha = max(alpha, best['score'])
-                if best['score'] >= beta:
+
+                alpha = max(alpha, best["score"])
+                if best["score"] >= beta:
                     break
             return best
         else:
-            best = {'move': None, 'score': math.inf}
+            best = {"move": None, "score": math.inf}
             for move in state.possible_moves():
                 state.set_move(move, self.other_player)
-                check = self.minimax(state, depth+1, alpha, beta, True)
+                check = self.minimax(state, depth + 1, alpha, beta, True)
 
-                state.set_move(move, ' ') # undo move
-                check['move'] = move # attribute move to its resulting board state
+                state.set_move(move, " ")  # undo move
+                check["move"] = move  # attribute move to its resulting board state
 
-                if check['score'] < best['score']:
+                if check["score"] < best["score"]:
                     best = check
-                
-                beta = min(beta, best['score'])
-                if best['score'] <= alpha:
+
+                beta = min(beta, best["score"])
+                if best["score"] <= alpha:
                     break
             return best
