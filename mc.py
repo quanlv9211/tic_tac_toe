@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+import copy
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
@@ -13,8 +14,9 @@ class MonteCarloRunner(object):
         # self.player2 = load_opponent_model(self.args).to(self.args.device)
         self.player1 = load_model(self.args)
         self.player2 = load_opponent_model(self.args)
-        dict_args = dict(args)
-        self.simulator = Simulator(**dict_args, self.player1, self.player2)
+        dict_args = vars(args)
+        self.simulator = Simulator(**dict_args, player1=self.player1, player2=self.player2)
+
         print("Player 2 is replaced with MonteCarlo agent")
         self.gamma = 0.99
 
@@ -35,7 +37,7 @@ class MonteCarloRunner(object):
         self.q_values = {}
         ret = []
 
-        for eps in range(10000):
+        for eps in range(20000):
             state, avail_action = self.simulator.reset()
             states = [state]
             actions = []
@@ -45,29 +47,38 @@ class MonteCarloRunner(object):
                 if np.random.binomial(1, 0.05) == 1:
                     action = np.random.choice(avail_action)
                 else:
-                    q = self.q_values.get(state, np.zeros(n_actions))
-                    self.q_values[state] = q
+                    q = copy.deepcopy(self.q_values.get(state, np.random.randn(n_actions)))
+                    # self.q_values[state] = q
 
                     q[
                         avail_action
-                    ] += 100000  # we choose greedy action from available actions only
+                    ] += 100  # we choose greedy action from available actions only
                     action = np.argmax(q)
                 state, reward, done, avail_action = self.simulator.step(action)
 
-                states.append(state)
+                states.append(copy.deepcopy(state))
                 rewards.append(reward)
                 actions.append(action)
 
-            G = 0
-            for t in range(len(rewards), -1, -1):
+            G = 0.0
+            for t in reversed(range(len(rewards))):
                 st = states[t]
                 rt = rewards[t]
                 at = actions[t]
                 G = self.gamma * G + rt
 
-                q = self.q_values[st]
-                q[at] += 0.05 * (G - q[at])
+                q = self.q_values.get(st, np.zeros(n_actions, dtype=float))
+                
+                q[at] += 0.2 * (G - q[at])
+                
+                # q[at] = G
+                assert np.max(np.abs(q)) < 1.0001,q
                 self.q_values[st] = q
+                
+
+            ret.append(np.sum(rewards))
+        
+        return ret
 
     def test(self):
         logger.info("Start testing")
@@ -81,15 +92,19 @@ class MonteCarloRunner(object):
 
             while not self.simulator.current_board.gameover():
 
-                if np.random.binomial(1, 0.01) == 1:
+                if np.random.binomial(1, 0.001) == 1:
                     action = np.random.choice(avail_action)
                 else:
-                    q = self.q_values.get(state, np.zeros(self.n_actions))
+                    q = self.q_values.get(state, None)
+                    if q is None:
+                        print("not found")
+                        q = np.random.randn(self.n_actions)
                     self.q_values[state] = q
+                    q = copy.deepcopy(q)
 
                     q[
                         avail_action
-                    ] += 100000  # we choose greedy action from available actions only
+                    ] += 100  # we choose greedy action from available actions only
                     action = np.argmax(q)
                 state, reward, done, avail_action = self.simulator.step(action)
 
@@ -115,3 +130,13 @@ if __name__ == "__main__":
     set_random(args.seed)
     init_logger(prepare_dir(args.output_folder) + "result.txt")
     runner = MonteCarloRunner(args)
+    ret = runner.train_mc()
+    import matplotlib.pyplot as plt
+    from scipy.signal import savgol_filter
+    ret = savgol_filter(ret, 300, 1)
+    plt.plot(ret)
+    plt.xlabel('episodes')
+    plt.ylabel('rewards') 
+    plt.title("MC control")
+    plt.savefig("res.png")
+    runner.test()

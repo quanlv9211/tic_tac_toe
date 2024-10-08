@@ -12,6 +12,7 @@ class Simulator:
         winstreak: int,
         player1: Player,
         player2: Player,
+        **kwargs
     ):
         self.p1 = player1
         self.p2 = player2
@@ -116,7 +117,12 @@ class Simulator:
         # agent plays as 'O'
         self.current_board.set_move(move, "O")
         if self.current_board.gameover():
-            return self.get_obs(), self.get_reward(), self.get_done()
+            return (
+                self.get_obs(),
+                self.get_reward(),
+                self.get_done(),
+                self.current_board.available_actions(),
+            )
 
         # bot move
         self.move_fn(self.p1, self.current_board, "X")

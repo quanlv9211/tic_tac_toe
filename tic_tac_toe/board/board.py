@@ -85,15 +85,14 @@ class Board:
             if index + 1 < self.height:
                 print("  " + "-" * (self.width * 4 - 3))
 
-    @classmethod
-    def to_string(cls, board):
-        row2str = ["".join(row) for row in board]
+    def to_string(self):
+        row2str = ["".join(row) for row in self.board]
         return "".join(row2str)
 
     def available_actions(self):
         """
         similar to `possible_moves`, but return action id instead
         """
-        all_moves = self.possible_moves(self)
+        all_moves = self.possible_moves()
         all_ids = [self.move2id(mv) for mv in all_moves]
         return all_ids
