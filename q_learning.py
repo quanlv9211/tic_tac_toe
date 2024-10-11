@@ -19,7 +19,7 @@ class QlearningRunner(object):
             **dict_args, player1=self.player1, player2=self.player2
         )
 
-        print("Player 2 is replaced with MonteCarlo agent")
+        print("Player 2 is replaced with Q learning agent")
         self.gamma = 0.99
 
     def train_mc(self):
@@ -61,6 +61,7 @@ class QlearningRunner(object):
                 q = copy.deepcopy(self.q_values.get(state, np.zeros(n_actions)))
                 next_q = np.max(q) if not done else 0
                 q[action] = q[action] + 0.1 * (reward + self.gamma * next_q - q[action])
+                self.q_values[state] = q
                 state = next_state
                 rewards.append(reward)
 
@@ -102,7 +103,7 @@ class QlearningRunner(object):
                 player2_win += 1
 
         logger.info(
-            "%d games, player 1 winrate %.02f, player 2 (MC agent) winrate %.02f"
+            "%d games, player 1 winrate %.02f, player 2 (Q Learning agent) winrate %.02f"
             % (turns, player1_win / turns, player2_win / turns)
         )
 
@@ -126,6 +127,6 @@ if __name__ == "__main__":
     plt.plot(ret)
     plt.xlabel("episodes")
     plt.ylabel("rewards")
-    plt.title("MC control")
-    plt.savefig("res.png")
+    plt.title("Q learning")
+    plt.savefig("ql.png")
     runner.test()
