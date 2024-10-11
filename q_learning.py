@@ -59,7 +59,10 @@ class QlearningRunner(object):
                 next_state, reward, done, avail_action = self.simulator.step(action)
 
                 q = copy.deepcopy(self.q_values.get(state, np.zeros(n_actions)))
-                next_q = np.max(q) if not done else 0
+                next_q = copy.deepcopy(
+                    self.q_values.get(next_state, np.zeros(n_actions))
+                )
+                next_q = np.max(next_q) if not done else 0
                 q[action] = q[action] + 0.1 * (reward + self.gamma * next_q - q[action])
                 self.q_values[state] = q
                 state = next_state
