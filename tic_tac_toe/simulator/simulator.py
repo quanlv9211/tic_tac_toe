@@ -26,7 +26,7 @@ class Simulator:
         # the state is the board
         self.current_board = Board(width, height, winstreak)
 
-    def reset(self):
+    def core_reset(self):
         self.current_board = Board(self.width, self.height, self.winstreak)
 
     def move_fn(self, player: Player, board: Board, symbol: str):
