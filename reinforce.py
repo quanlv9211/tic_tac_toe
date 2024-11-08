@@ -103,13 +103,14 @@ class ReinforceRunner(object):
             reward_to_go = np.zeros(len(rewards) + 1)
             # the last reward to go is 0, this is similar to (1-done) in q learning
             for t in reversed(range(len(rewards))):
-                reward_to_go[t] = rewards[t] + self.gamma * reward_to_go[t - 1]
+                reward_to_go[t] = rewards[t] + self.gamma * reward_to_go[t + 1]
 
             # optimize
             states = torch.as_tensor(np.array(states[:-1]), device=self.device)
             reward_to_go = torch.as_tensor(reward_to_go[:-1], device=self.device)
             actions = torch.as_tensor(np.array(actions), device=self.device).long()
             _, dist = self.policy(states)
+            # print(reward_to_go)
 
             log_prob = dist.log_prob(actions)
             # print(reward_to_go)
