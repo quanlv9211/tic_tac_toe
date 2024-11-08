@@ -62,6 +62,7 @@ class ReinforceRunner(object):
         input_dim = (
             self.simulator.current_board.width * self.simulator.current_board.height
         )
+        self.input_dim = input_dim
 
         # at each steps, the number of possible actions equal the number of empty square,
         # which is at most the size of the board at the beginning of the game
@@ -87,7 +88,10 @@ class ReinforceRunner(object):
 
                 with torch.no_grad():
                     state = torch.as_tensor(state, device=self.device)
-                    action, dist = self.policy(state)
+                    mask = np.zeros(input_dim, dtype=bool)
+                    mask[avail_action] = 1
+                    mask = torch.as_tensor(np.array(mask), device=self.device)
+                    action, dist = self.policy(state, mask)
                     action = action.cpu().numpy()
                 state, reward, done, avail_action = self.simulator.step(action)
                 state = str2vec(state)
@@ -136,7 +140,10 @@ class ReinforceRunner(object):
 
                 with torch.no_grad():
                     state = torch.as_tensor(state, device=self.device)
-                    action, dist = self.policy(state)
+                    mask = np.zeros(self.input_dim, dtype=bool)
+                    mask[avail_action] = 1
+                    mask = torch.as_tensor(np.array(mask), device=self.device)
+                    action, dist = self.policy(state, mask)
                     action = action.cpu().numpy()
                 state, reward, done, avail_action = self.simulator.step(action)
                 state = str2vec(state)
@@ -147,7 +154,7 @@ class ReinforceRunner(object):
                 player2_win += 1
 
         logger.info(
-            "%d games, player 1 winrate %.02f, player 2 (MC agent) winrate %.02f"
+            "%d games, player 1 winrate %.02f, player 2 (REINFORCE agent) winrate %.02f"
             % (turns, player1_win / turns, player2_win / turns)
         )
 
