@@ -54,7 +54,7 @@ class ReinforceRunner(object):
             **dict_args, player1=self.player1, player2=self.player2
         )
 
-        print("Player 2 is replaced with MonteCarlo agent")
+        print("Player 2 is replaced with Reinforce agent")
         self.gamma = 0.99
         self.device = "cpu"
 

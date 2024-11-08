@@ -178,7 +178,7 @@ class DeepQlearningRunner(object):
                 with torch.no_grad():
                     next_q = target_q_values(next_obses)
                     assert next_q.shape == masks.shape
-                    next_q[~masks] -= 100
+                    next_q[~masks.bool()] -= 100
                     next_q_max = next_q.max(dim=-1)[0]
                     next_q_max = torch.clamp(next_q_max, min=-1)
                     assert (
